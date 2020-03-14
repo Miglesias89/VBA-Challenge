@@ -1,0 +1,120 @@
+Sub StockData()
+
+    For Each ws In Worksheets
+        
+        'Set variable for ticker, min/max date, price change, vol total and table
+        Dim ticker As String
+        Dim openPrice As Double
+        Dim closePrice As Double
+        Dim priceChange As Double
+        Dim percentChange As Double
+        Dim Vol_Total As Double
+        Dim Summary_Table_Row As Double
+            
+        'Set header for Summary Table
+        ws.Range("I1").Value = "Ticker"
+        ws.Range("J1").Value = "Yearly Change"
+        ws.Range("K1").Value = "Percent_Change"
+        ws.Range("L1").Value = "Total Volume"
+        
+        'Determine the Last Row
+        lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+           
+        'Set location of Summary Table
+        Summary_Table_Row = 2
+        
+        'Set the volume
+        Vol_Total = 0
+        
+        'Start price for each ticker
+        StartRow = 2
+               
+            'Loop through all tickers
+            For i = 2 To lastrow
+            
+                'Check if we are still within the same ticker, if it is not...
+                If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+                
+                        'Set the ticker name
+                        ticker = ws.Cells(i, 1).Value
+                         
+                        'Add to the ticker total
+                        Vol_Total = Vol_Total + ws.Cells(i, 7).Value
+                        
+                        'Closing price
+                        closePrice = ws.Cells(i, 6).Value
+                        
+                         'Calculate price change
+                        priceChange = (closePrice) - (openPrice)
+                        
+                        If openPrice = 0 Then
+                        'Print the percent change
+                        ws.Range("K" & Summary_Table_Row).Value = "N/A"
+                        
+                        Else
+                        
+                        'Calculate percent of price change
+                        percentChange = ((priceChange) / (openPrice))
+                        
+                        'Print the percent change
+                        ws.Range("K" & Summary_Table_Row).Value = Format(percentChange, "Percent")
+                        
+                        End If
+                                                                                                
+                        'Move to the next row
+                        StartRow = i + 1
+                             
+                         'Print the ticker value in the Summary Table
+                        ws.Range("I" & Summary_Table_Row).Value = ticker
+                        
+                        'Print the price change to the Summary Table
+                        ws.Range("J" & Summary_Table_Row).Value = priceChange
+                        
+                        'Print the percent change
+                                                                    
+                        'Print the volume to the Summary Table
+                        ws.Range("L" & Summary_Table_Row).Value = Vol_Total
+                        
+                        'Add one to the Summary Table row
+                        Summary_Table_Row = Summary_Table_Row + 1
+                 
+                        'Reset the volume total
+                        Vol_Total = 0
+                          
+                Else
+                
+                    'Opening price
+                    openPrice = ws.Cells(StartRow, 3).Value
+                    
+                    'Add the volume total
+                    Vol_Total = Vol_Total + ws.Cells(i, 7).Value
+            
+               
+                    End If
+                    
+              Next i
+              
+              For i = 2 To lastrow
+              
+                If ws.Cells(i, 10) = 0 Then
+                
+                   ws.Cells(i, 10).Interior.Color = xlNone
+                
+                ElseIf ws.Cells(i, 10) > 0 Then
+                    ws.Cells(i, 10).Interior.Color = vbGreen
+                                       
+                Else
+                    ws.Cells(i, 10).Interior.Color = vbRed
+                    
+            End If
+            
+        Next i
+       
+    Next ws
+    
+End Sub
+
+
+
+
+
